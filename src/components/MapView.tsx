@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { GeoPoint } from '../geolocation';
@@ -12,18 +12,16 @@ interface Props {
   mapTarget: { lat: number; lng: number; zoom: number } | null;
   recenterKey?: number;
   onAdd: () => void;
+  onSelectSpot?: (id: string) => void;
   layoutKey?: string;
 }
 
 const MATCHA_ICON = L.divIcon({
   className: 'matcha-marker',
-  html: `<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 0C6.3 0 0 6.3 0 14c0 10 14 22 14 22s14-12 14-22C28 6.3 21.7 0 14 0z" fill="#2f6b4f"/>
-    <circle cx="14" cy="14" r="5.5" fill="#fff"/>
-  </svg>`,
-  iconSize: [28, 36],
-  iconAnchor: [14, 36],
-  popupAnchor: [0, -32],
+  html: `<span class="neon-pin"></span>`,
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+  popupAnchor: [0, -10],
 });
 
 function invalidate(map: L.Map) {
@@ -43,6 +41,10 @@ function syncMapSize(map: L.Map, node: HTMLElement) {
   }
 }
 
+function spotsWithCoords(spots: Spot[]) {
+  return spots.filter((s): s is Spot & { lat: number; lng: number } => s.lat != null && s.lng != null);
+}
+
 export function MapView({
   spots,
   focus,
@@ -50,6 +52,7 @@ export function MapView({
   mapTarget,
   recenterKey = 0,
   onAdd,
+  onSelectSpot,
   layoutKey,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -59,7 +62,12 @@ export function MapView({
   const userMarkerRef = useRef<L.CircleMarker | null>(null);
   const appliedTargetRef = useRef<string | null>(null);
   const mapTargetRef = useRef(mapTarget);
+  const onSelectRef = useRef(onSelectSpot);
+  const fittedSpotsRef = useRef(false);
   mapTargetRef.current = mapTarget;
+  onSelectRef.current = onSelectSpot;
+
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -90,7 +98,6 @@ export function MapView({
       if (cancelled || mapRef.current || !containerRef.current || !wrapRef.current) return;
 
       const { clientWidth: w, clientHeight: h } = wrapRef.current;
-      // Wait until the flex layout has a real map pane (not a transient tiny width)
       if (w < 200 || h < 200) {
         requestAnimationFrame(init);
         return;
@@ -111,16 +118,24 @@ export function MapView({
 
       const start = mapTargetRef.current ?? { lat: 40.728, lng: -73.998, zoom: 13 };
       const map = L.map(containerRef.current, {
-        zoomControl: true,
+        zoomControl: false,
+        attributionControl: false,
         fadeAnimation: false,
         zoomAnimation: true,
         markerZoomAnimation: false,
         wheelDebounceTime: 50,
       }).setView([start.lat, start.lng], start.zoom);
 
+      L.control
+        .attribution({ prefix: false, position: 'bottomright' })
+        .addTo(map)
+        .setPrefix('')
+        .addAttribution(
+          '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a>',
+        );
+
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        attribution: '',
         subdomains: 'abcd',
         maxZoom: 20,
         updateWhenZooming: false,
@@ -131,8 +146,8 @@ export function MapView({
       markersLayerRef.current = L.layerGroup().addTo(map);
       mapRef.current = map;
       appliedTargetRef.current = `${start.lat.toFixed(4)},${start.lng.toFixed(4)},${start.zoom}:0`;
+      setMapReady(true);
 
-      // Leaflet often needs several passes after flex layout settles
       scheduleSync();
       pendingInvalidates.push(
         window.setTimeout(scheduleSync, 50),
@@ -169,10 +184,12 @@ export function MapView({
       pendingInvalidates.forEach((id) => clearTimeout(id));
       ro.disconnect();
       window.removeEventListener('resize', fixSize);
+      setMapReady(false);
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
+      markersLayerRef.current = null;
     };
   }, []);
 
@@ -196,20 +213,20 @@ export function MapView({
     if (userLocation) {
       userMarkerRef.current = L.circleMarker([userLocation.lat, userLocation.lng], {
         radius: 7,
-        color: '#ffffff',
+        color: '#111111',
         weight: 2,
-        fillColor: '#2f6b4f',
+        fillColor: '#b8ff3c',
         fillOpacity: 1,
       })
         .addTo(map)
         .bindPopup('You are here');
     }
-  }, [userLocation]);
+  }, [userLocation, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
     const node = containerRef.current;
-    if (!map || !mapTarget) return;
+    if (!map || !mapTarget || !mapReady) return;
 
     const key = `${mapTarget.lat.toFixed(4)},${mapTarget.lng.toFixed(4)},${mapTarget.zoom}:${recenterKey}`;
     if (appliedTargetRef.current === key) return;
@@ -222,21 +239,31 @@ export function MapView({
     if (node) {
       requestAnimationFrame(() => syncMapSize(map, node));
     }
-  }, [mapTarget?.lat, mapTarget?.lng, mapTarget?.zoom, recenterKey]);
+  }, [mapTarget?.lat, mapTarget?.lng, mapTarget?.zoom, recenterKey, mapReady]);
 
   useEffect(() => {
+    const map = mapRef.current;
     const layer = markersLayerRef.current;
-    if (!layer) return;
+    if (!mapReady || !map || !layer) return;
 
     layer.clearLayers();
-    spots.forEach((s) => {
-      if (s.lat != null && s.lng != null) {
-        L.marker([s.lat, s.lng], { icon: MATCHA_ICON })
-          .bindPopup(`<b>${s.name}</b><br>${s.addr}`)
-          .addTo(layer);
-      }
+    const plotted = spotsWithCoords(spots);
+
+    plotted.forEach((s) => {
+      const marker = L.marker([s.lat, s.lng], { icon: MATCHA_ICON });
+      marker.on('click', () => onSelectRef.current?.(s.id));
+      marker.addTo(layer);
     });
-  }, [spots]);
+
+    // First time we have pins, frame them so they're actually on screen
+    if (!fittedSpotsRef.current && plotted.length > 0 && !focus) {
+      fittedSpotsRef.current = true;
+      const bounds = L.latLngBounds(plotted.map((s) => [s.lat, s.lng] as [number, number]));
+      if (bounds.isValid()) {
+        map.fitBounds(bounds.pad(0.35), { animate: false, maxZoom: 14 });
+      }
+    }
+  }, [spots, mapReady, focus]);
 
   useEffect(() => {
     if (focus && mapRef.current) {

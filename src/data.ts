@@ -1,6 +1,7 @@
 import type { Spot } from './types';
 import { curatedPlaces } from './regions';
 
+/** Default spots used when this device has nothing saved yet. */
 export const initialSpots: Spot[] = [
   { id: 's1', name: 'teabowl', addr: '77 Greenwich Ave', lat: 40.7359, lng: -74.0027, rating: 0, punches: 0 },
   { id: 's2', name: 'test', addr: '77 Greenwich Ave', lat: 40.7361, lng: -74.0031, rating: 0, punches: 0 },
