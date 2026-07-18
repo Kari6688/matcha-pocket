@@ -215,7 +215,7 @@ export function MapView({
         radius: 7,
         color: '#111111',
         weight: 2,
-        fillColor: '#b8ff3c',
+        fillColor: '#00CD00',
         fillOpacity: 1,
       })
         .addTo(map)

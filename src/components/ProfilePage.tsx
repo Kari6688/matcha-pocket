@@ -4,22 +4,42 @@ import { useAuth } from '../auth';
 interface Props {
   spotCount: number;
   tinCount: number;
+  isGuest?: boolean;
+  onRequestSignUp?: () => void;
 }
 
-export function ProfilePage({ spotCount, tinCount }: Props) {
-  const { isSignedIn, email } = useAuth();
+export function ProfilePage({ spotCount, tinCount, isGuest, onRequestSignUp }: Props) {
+  const { isSignedIn, email, signOut } = useAuth();
 
   return (
     <div className="profile-page">
       <header className="collection-head">
         <h1 className="collection-title">Profile</h1>
-        <AuthControls />
+        {isSignedIn && <AuthControls />}
       </header>
 
-      {!isSignedIn ? (
+      {isGuest && !isSignedIn ? (
+        <div className="profile-guest">
+          <p className="profile-guest-label">Browsing as guest</p>
+          <p className="profile-note">
+            Explore the map freely. Sign up to unlock your matcha library and save spots. Social
+            features will live here later.
+          </p>
+          <button type="button" className="auth-google-btn" onClick={onRequestSignUp}>
+            Sign up
+          </button>
+          <button
+            type="button"
+            className="welcome-guest profile-leave-guest"
+            onClick={() => void signOut()}
+          >
+            Back to welcome
+          </button>
+        </div>
+      ) : !isSignedIn ? (
         <AuthWall
-          title="Sign up or log in with Google"
-          body="Use your Google account to save spots and your tin collection — private to you. First visit creates your account; next time you’re logged right in."
+          title="Sign up or log in"
+          body="Use Google or email to save spots and your tin collection."
         />
       ) : (
         <>
@@ -38,8 +58,7 @@ export function ProfilePage({ spotCount, tinCount }: Props) {
             </div>
           </div>
           <p className="profile-note">
-            Your spots and tins are stored on this device under your Google account. Signing out
-            hides them until you sign back in.
+            Your spots and tins are stored on this device under your account.
           </p>
         </>
       )}

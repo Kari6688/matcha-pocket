@@ -8,7 +8,7 @@ const SKINS: Record<
   wako: { body: '#f7f5f0', lid: '#2d6b3a', band: '#1a1a1a', label: '#111', text: '#111' },
   jade: { body: '#1f4d3a', lid: '#c5d8c8', band: '#9ee06c', label: '#f4f1ea', text: '#163528' },
   ember: { body: '#5c3a28', lid: '#d4a574', band: '#e8c48a', label: '#fff8f0', text: '#3a2416' },
-  ink: { body: '#1c1c1c', lid: '#3a3a3a', band: '#b8ff3c', label: '#f5f5f5', text: '#111' },
+  ink: { body: '#1c1c1c', lid: '#3a3a3a', band: '#00CD00', label: '#f5f5f5', text: '#111' },
   cream: { body: '#ebe4d8', lid: '#8a9a7a', band: '#c4b8a4', label: '#fff', text: '#2a2a2a' },
 };
 

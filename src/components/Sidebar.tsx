@@ -163,7 +163,7 @@ export function Sidebar({
         <div className="brand-row">
           <div className="brand">
             <span className="brand-dot" />
-            <span className="brand-name">Matcha Map</span>
+            <span className="brand-name">Matcha Pocket</span>
           </div>
           <AuthControls />
         </div>

@@ -70,7 +70,13 @@ export function GoogleSignInButton({
   );
 }
 
-export function EmailSignInForm({ onStarted }: { onStarted?: () => void }) {
+export function EmailSignInForm({
+  onStarted,
+  label = 'Or use your email',
+}: {
+  onStarted?: () => void;
+  label?: string;
+}) {
   const { signInWithEmail, configured } = useAuth();
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
@@ -104,7 +110,7 @@ export function EmailSignInForm({ onStarted }: { onStarted?: () => void }) {
   return (
     <form className="auth-email-form" onSubmit={onSubmit}>
       <label className="auth-email-label" htmlFor="auth-email">
-        Or use your email
+        {label}
       </label>
       <input
         id="auth-email"
@@ -164,8 +170,8 @@ export function AuthWall({ title, body }: { title: string; body: string }) {
           <GoogleSignInButton />
           <EmailSignInForm />
           <p className="auth-wall-hint">
-            Google works after you enable it in Supabase. Email login works now — signup and login
-            use the same link.
+            Email magic link works now. Google needs to be enabled in Supabase → Authentication →
+            Providers.
           </p>
         </>
       ) : (

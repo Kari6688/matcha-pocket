@@ -14,10 +14,11 @@ import { TinDetail } from './components/TinDetail';
 import { AddTinSheet } from './components/AddTinSheet';
 import { ProfilePage } from './components/ProfilePage';
 import { AuthWall, EmailSignInForm, GoogleSignInButton } from './components/AuthControls';
+import { WelcomeScreen } from './components/WelcomeScreen';
 import { Sheet } from './components/Sheet';
 
 export default function App() {
-  const { isLoaded, isSignedIn, userId } = useAuth();
+  const { isLoaded, isSignedIn, isGuest, canEnterApp, userId, continueAsGuest } = useAuth();
   const location = useLocationSettings();
   const [dataUserId, setDataUserId] = useState<string | null>(null);
 
@@ -135,6 +136,14 @@ export default function App() {
     if (next !== 'map') setDrawerOpen(false);
   };
 
+  if (!isLoaded) {
+    return <div className="app-loading" aria-busy="true" />;
+  }
+
+  if (!canEnterApp) {
+    return <WelcomeScreen onGuest={continueAsGuest} />;
+  }
+
   return (
     <div
       className={`app${drawerOpen ? ' drawer-expanded' : ''}${tab !== 'map' ? ' tab-page' : ''}`}
@@ -175,8 +184,8 @@ export default function App() {
               <h1 className="collection-title">Your collection</h1>
             </header>
             <AuthWall
-              title="Sign up or log in with Google"
-              body="Your matcha tins are private. Use Google to create an account or log back in, then add and browse your collection."
+              title="Sign up to build your matcha library"
+              body="Guests can explore the map. Create an account to save tins, track taste notes, and grow your collection."
             />
           </div>
         ))}
@@ -185,6 +194,8 @@ export default function App() {
         <ProfilePage
           spotCount={isSignedIn ? spots.length : 0}
           tinCount={isSignedIn ? collection.length : 0}
+          isGuest={isGuest}
+          onRequestSignUp={() => setAuthPromptOpen(true)}
         />
       )}
 
@@ -244,14 +255,16 @@ export default function App() {
       />
 
       <Sheet open={authPromptOpen} onClose={() => setAuthPromptOpen(false)}>
-        <div className="auth-prompt">
-          <div className="sheet-title">Sign up or log in</div>
+        <div className="auth-prompt welcome-sheet">
+          <div className="sheet-title">Sign up to continue</div>
           <p className="auth-prompt-body">
-            Adding spots and saving your collection needs an account. Use Google (once enabled) or
-            email — new users are created automatically.
+            Saving spots and your matcha library needs an account. Guests can keep exploring the
+            map anytime.
           </p>
-          <GoogleSignInButton onStarted={() => setAuthPromptOpen(false)} />
-          <EmailSignInForm onStarted={() => setAuthPromptOpen(false)} />
+          <div className="welcome-sheet-auth">
+            <GoogleSignInButton label="Continue with Google" />
+            <EmailSignInForm label="Email" />
+          </div>
         </div>
       </Sheet>
     </div>

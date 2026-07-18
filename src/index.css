@@ -1,12 +1,12 @@
 :root {
-  --brand:        #b8ff3c;
-  --brand-strong: #9eef18;
-  --brand-soft:   #7ed321;
-  --brand-glow:   rgba(184, 255, 60, 0.28);
-  --pin-bg:       #f0ffe0;
-  --sage-bg:      #f7f7f5;
-  --sage-border:  #e4e4e0;
-  --sage-disabled:#d0d0cc;
+  --brand:        #00CD00;
+  --brand-strong: #00b800;
+  --brand-soft:   #00a300;
+  --brand-glow:   rgba(0, 205, 0, 0.28);
+  --pin-bg:       #e9ffe9;
+  --sage-bg:      #f4faf4;
+  --sage-border:  #d8e8d8;
+  --sage-disabled:#c5d5c5;
   --text:         #111111;
   --muted:        #6b6b6b;
   --muted-2:      #9a9a9a;
@@ -16,6 +16,8 @@
   --card-border:  #e8e8e8;
   --white:        #ffffff;
   --page:         #fafafa;
+  --welcome-bg:   #ffffff;
+  --welcome-logo: #111111;
   --font:         'PP Neue Montreal Mono', 'PP Neue Montreal', ui-monospace, monospace;
   --font-mono:    var(--font);
   --font-serif:   var(--font);
@@ -138,9 +140,9 @@ body {
   gap: 10px;
   width: 100%;
   max-width: 320px;
-  border: none;
-  background: var(--brand);
-  color: #1a1516;
+  border: 1.5px solid var(--card-border);
+  background: #fff;
+  color: #111;
   border-radius: 14px;
   padding: 14px 18px;
   font-family: var(--font-mono);
@@ -148,6 +150,10 @@ body {
   font-weight: 600;
   cursor: pointer;
   min-height: 52px;
+}
+
+.auth-google-btn:hover:not(:disabled) {
+  border-color: #111;
 }
 
 .google-mark {
@@ -248,6 +254,247 @@ body {
   color: var(--muted);
 }
 
+/* ---------- Welcome / splash ---------- */
+.app-loading {
+  min-height: 100dvh;
+  background: var(--welcome-bg);
+}
+
+.welcome-screen {
+  min-height: 100dvh;
+  min-height: 100svh;
+  background: var(--welcome-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding:
+    calc(56px + env(safe-area-inset-top, 0px))
+    28px
+    calc(36px + env(safe-area-inset-bottom, 0px));
+  position: relative;
+}
+
+.welcome-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+  animation: welcome-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.welcome-illo {
+  width: min(58vw, 220px);
+  height: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  animation: welcome-float 5.5s ease-in-out infinite;
+}
+
+.welcome-title {
+  margin: 0;
+  font-family: var(--font);
+  font-size: clamp(28px, 7vw, 36px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--welcome-logo);
+  text-transform: lowercase;
+  text-align: center;
+}
+
+.welcome-actions {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: welcome-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+.welcome-btn-row {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+}
+
+.welcome-btn {
+  flex: 1;
+  border-radius: 999px;
+  padding: 14px 16px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 48px;
+  border: none;
+  transition: background 0.15s, transform 0.12s;
+}
+
+.welcome-btn.soft {
+  background: #efefef;
+  color: #111;
+}
+
+.welcome-btn.soft:hover {
+  background: #e6e6e6;
+}
+
+.welcome-btn.soft:active {
+  transform: scale(0.98);
+}
+
+.welcome-guest {
+  border: none;
+  background: transparent;
+  color: #111;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.welcome-guest:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.welcome-sheet-auth {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+}
+
+.welcome-sheet .auth-google-wrap,
+.welcome-sheet .auth-google-btn,
+.welcome-sheet .auth-apple-btn,
+.welcome-sheet .auth-email-form {
+  max-width: none;
+  width: 100%;
+}
+
+.auth-apple-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  border: 1.5px solid #111;
+  background: #111;
+  color: #fff;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 52px;
+}
+
+.auth-apple-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 2px;
+  color: var(--muted-2);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.auth-provider-disabled {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  text-align: center;
+}
+
+.auth-sent {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+  text-align: center;
+}
+
+@keyframes welcome-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes welcome-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.profile-guest {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding-top: 12px;
+}
+
+.profile-guest-label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand-soft);
+}
+
+.profile-leave-guest {
+  color: var(--muted) !important;
+  padding-left: 0 !important;
+}
+
+.profile-email {
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 60%;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .profile-email {
   font-size: 13px;
   font-weight: 600;
@@ -276,8 +523,8 @@ body {
 
 .auth-google-btn:disabled,
 .auth-signin-btn:disabled {
-  opacity: 0.6;
-  cursor: wait;
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .setup-missing {
@@ -1143,7 +1390,7 @@ body {
   left: 0;
   top: 0;
   bottom: 0;
-  background: rgba(184, 255, 60, 0.55);
+  background: rgba(0, 205, 0, 0.45);
   transition: width 0.2s ease;
 }
 
