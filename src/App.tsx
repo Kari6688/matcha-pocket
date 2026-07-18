@@ -23,6 +23,9 @@ import { ProfilePage } from './components/ProfilePage';
 import { AuthWall, EmailSignInForm, GoogleSignInButton } from './components/AuthControls';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { Sheet } from './components/Sheet';
+import { MapFilterSheet } from './components/MapFilterSheet';
+import type { SpotFilters } from './components/MapView';
+import type { PlaceResult } from './types';
 
 export default function App() {
   const { isLoaded, isSignedIn, isGuest, canEnterApp, userId, continueAsGuest } = useAuth();
@@ -46,6 +49,12 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [locOpen, setLocOpen] = useState(false);
   const [recenterKey, setRecenterKey] = useState(0);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [spotFilters, setSpotFilters] = useState<SpotFilters>({
+    minRating: 0,
+    punchedOnly: false,
+  });
+  const [addPrefill, setAddPrefill] = useState<PlaceResult | null>(null);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -140,6 +149,13 @@ export default function App() {
   const selected = spots.find((s) => s.id === selectedId) ?? null;
   const selectedTin = collection.find((t) => t.id === selectedTinId) ?? null;
 
+  const filteredSpots = spots.filter((s) => {
+    if (spotFilters.minRating > 0 && s.rating < spotFilters.minRating) return false;
+    if (spotFilters.punchedOnly && s.punches <= 0) return false;
+    return true;
+  });
+  const filtersActive = spotFilters.minRating > 0 || spotFilters.punchedOnly;
+
   const mapTarget = {
     lat: location.mapCenter.lat,
     lng: location.mapCenter.lng,
@@ -160,10 +176,40 @@ export default function App() {
     setRecenterKey((n) => n + 1);
   };
 
+  const locateUser = () => {
+    if (location.deviceLocation) {
+      setFocus({ lat: location.deviceLocation.lat, lng: location.deviceLocation.lng });
+      setRecenterKey((n) => n + 1);
+      return;
+    }
+    location.enableDeviceLocation();
+    goToArea();
+  };
+
   const select = (id: string) => {
     setSelectedId(id);
     const s = spots.find((x) => x.id === id);
     if (s && s.lat != null && s.lng != null) setFocus({ lat: s.lat, lng: s.lng });
+  };
+
+  const pickPlace = (place: PlaceResult) => {
+    const existing = spots.find(
+      (s) =>
+        s.name.toLowerCase() === place.name.toLowerCase() &&
+        (s.addr || '').toLowerCase() === (place.addr || '').toLowerCase(),
+    );
+    if (existing) {
+      select(existing.id);
+      setDrawerOpen(true);
+      return;
+    }
+    if (place.lat != null && place.lng != null) {
+      setFocus({ lat: place.lat, lng: place.lng });
+    }
+    requireAuth(() => {
+      setAddPrefill(place);
+      setAddOpen(true);
+    });
   };
 
   const update = (id: string, patch: Partial<Spot>) => {
@@ -219,17 +265,27 @@ export default function App() {
       {tab === 'map' && (
         <>
           <MapView
-            spots={isSignedIn ? spots : []}
+            spots={isSignedIn ? filteredSpots : []}
             focus={focus}
             userLocation={location.deviceLocation}
             mapTarget={mapTarget}
             recenterKey={recenterKey}
-            onAdd={() => requireAuth(() => setAddOpen(true))}
+            searchCenter={location.searchCenter}
+            regionId={location.regionId}
+            onAdd={() => requireAuth(() => {
+              setAddPrefill(null);
+              setAddOpen(true);
+            })}
+            onOpenFavorites={() => setDrawerOpen(true)}
+            onLocate={locateUser}
+            onOpenFilters={() => setFilterOpen(true)}
             onSelectSpot={select}
+            onPickPlace={pickPlace}
             layoutKey={drawerOpen ? 'open' : 'closed'}
+            filtersActive={filtersActive}
           />
           <Sidebar
-            spots={isSignedIn ? spots : []}
+            spots={isSignedIn ? filteredSpots : []}
             onSelect={select}
             drawerOpen={drawerOpen}
             onDrawerOpenChange={setDrawerOpen}
@@ -249,7 +305,7 @@ export default function App() {
         ) : (
           <div className="collection-page">
             <header className="collection-head">
-              <h1 className="collection-title">Your collection</h1>
+              <h1 className="collection-title">My collection</h1>
             </header>
             <AuthWall
               title="Sign up to build your matcha library"
@@ -309,11 +365,22 @@ export default function App() {
 
       <AddSheet
         open={addOpen && !!isSignedIn}
-        onClose={() => setAddOpen(false)}
+        onClose={() => {
+          setAddPrefill(null);
+          setAddOpen(false);
+        }}
         onSave={addSpot}
         spots={spots}
         searchCenter={location.searchCenter}
         regionId={location.regionId}
+        initialPlace={addPrefill}
+      />
+
+      <MapFilterSheet
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        filters={spotFilters}
+        onChange={setSpotFilters}
       />
 
       <TinDetail tin={selectedTin} onClose={() => setSelectedTinId(null)} />

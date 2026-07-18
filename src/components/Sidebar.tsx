@@ -162,8 +162,7 @@ export function Sidebar({
       <div className="sidebar-top">
         <div className="brand-row">
           <div className="brand">
-            <span className="brand-dot" />
-            <span className="brand-name">Matcha Pocket</span>
+            <span className="brand-name">{open ? 'Favorites' : 'Matcha Pocket'}</span>
           </div>
           <AuthControls />
         </div>

@@ -80,11 +80,19 @@ export function WelcomeScreen({ onGuest }: Props) {
         </div>
 
         <div className="welcome-actions">
-          <div className="welcome-btn-row">
-            <button type="button" className="welcome-btn soft" onClick={() => setIntent('sign-up')}>
+          <div className="welcome-cta" role="group" aria-label="Account">
+            <button
+              type="button"
+              className="welcome-cta-btn primary"
+              onClick={() => setIntent('sign-up')}
+            >
               Sign up
             </button>
-            <button type="button" className="welcome-btn soft" onClick={() => setIntent('log-in')}>
+            <button
+              type="button"
+              className="welcome-cta-btn secondary"
+              onClick={() => setIntent('log-in')}
+            >
               Log in
             </button>
           </div>

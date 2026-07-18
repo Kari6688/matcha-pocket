@@ -2,8 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { GeoPoint } from '../geolocation';
-import type { Spot } from '../types';
-import { Plus } from './icons';
+import { searchPlaces } from '../places';
+import type { RegionId } from '../regions';
+import { matchesSearchQuery } from '../searchText';
+import type { PlaceResult, Spot } from '../types';
+import { Filter, Heart, Locate, Plus, Search } from './icons';
+
+export interface SpotFilters {
+  minRating: number;
+  punchedOnly: boolean;
+}
 
 interface Props {
   spots: Spot[];
@@ -11,9 +19,16 @@ interface Props {
   userLocation: GeoPoint | null;
   mapTarget: { lat: number; lng: number; zoom: number } | null;
   recenterKey?: number;
+  searchCenter: GeoPoint;
+  regionId: RegionId;
   onAdd: () => void;
+  onOpenFavorites: () => void;
+  onLocate: () => void;
+  onOpenFilters: () => void;
   onSelectSpot?: (id: string) => void;
+  onPickPlace: (place: PlaceResult) => void;
   layoutKey?: string;
+  filtersActive?: boolean;
 }
 
 const MATCHA_ICON = L.divIcon({
@@ -51,9 +66,16 @@ export function MapView({
   userLocation,
   mapTarget,
   recenterKey = 0,
+  searchCenter,
+  regionId,
   onAdd,
+  onOpenFavorites,
+  onLocate,
+  onOpenFilters,
   onSelectSpot,
+  onPickPlace,
   layoutKey,
+  filtersActive,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -68,6 +90,10 @@ export function MapView({
   onSelectRef.current = onSelectSpot;
 
   const [mapReady, setMapReady] = useState(false);
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<PlaceResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -271,12 +297,128 @@ export function MapView({
     }
   }, [focus]);
 
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) {
+      setResults([]);
+      setSearching(false);
+      return;
+    }
+    let cancelled = false;
+    setSearching(true);
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        try {
+          const saved = spots.filter(
+            (s) => matchesSearchQuery(s.name, q) || matchesSearchQuery(s.addr, q),
+          );
+          const remote = await searchPlaces(q, searchCenter, undefined, regionId);
+          if (cancelled) return;
+          const seen = new Set<string>();
+          const merged: PlaceResult[] = [];
+          for (const s of saved) {
+            const key = `${s.name}|${s.addr}`.toLowerCase();
+            if (seen.has(key)) continue;
+            seen.add(key);
+            merged.push({ name: s.name, addr: s.addr, lat: s.lat, lng: s.lng });
+          }
+          for (const p of remote) {
+            const key = `${p.name}|${p.addr}`.toLowerCase();
+            if (seen.has(key)) continue;
+            seen.add(key);
+            merged.push(p);
+          }
+          setResults(merged.slice(0, 10));
+        } catch (err) {
+          console.error(err);
+          if (!cancelled) setResults([]);
+        } finally {
+          if (!cancelled) setSearching(false);
+        }
+      })();
+    }, 280);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [query, searchCenter, regionId, spots]);
+
+  const pickResult = (place: PlaceResult) => {
+    setQuery(place.name);
+    setSearchOpen(false);
+    setResults([]);
+    onPickPlace(place);
+  };
+
   return (
     <div className="map-wrap" ref={wrapRef}>
       <div ref={containerRef} id="map" />
-      <button className="fab" onClick={onAdd} title="Add spot">
-        <Plus size={26} />
-      </button>
+
+      <div className={`map-search${searchOpen || query ? ' open' : ''}`}>
+        <Search size={18} className="map-search-icon" />
+        <input
+          className="map-search-input"
+          type="search"
+          placeholder="Search spots & places"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setSearchOpen(true);
+          }}
+          onFocus={() => setSearchOpen(true)}
+          enterKeyHint="search"
+        />
+        {(searchOpen || query.trim().length >= 2) && (
+          <div className="map-search-results">
+            {searching && <div className="map-search-status">Searching…</div>}
+            {!searching &&
+              results.map((r, i) => (
+                <button
+                  key={`${r.name}-${r.addr}-${i}`}
+                  type="button"
+                  className="map-search-item"
+                  onClick={() => pickResult(r)}
+                >
+                  <span className="map-search-item-name">{r.name}</span>
+                  <span className="map-search-item-addr">{r.addr}</span>
+                </button>
+              ))}
+            {!searching && query.trim().length >= 2 && results.length === 0 && (
+              <div className="map-search-status">No places found</div>
+            )}
+            <button
+              type="button"
+              className="map-search-add"
+              onClick={() => {
+                setSearchOpen(false);
+                onAdd();
+              }}
+            >
+              + Add a new spot
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="map-fab-stack">
+        <button type="button" className="fab" onClick={onAdd} title="Add spot">
+          <Plus size={22} />
+        </button>
+        <button type="button" className="fab" onClick={onOpenFavorites} title="Favorites">
+          <Heart size={20} />
+        </button>
+        <button type="button" className="fab" onClick={onLocate} title="My location">
+          <Locate size={20} />
+        </button>
+        <button
+          type="button"
+          className={`fab${filtersActive ? ' active' : ''}`}
+          onClick={onOpenFilters}
+          title="Filters"
+        >
+          <Filter size={20} />
+        </button>
+      </div>
     </div>
   );
 }

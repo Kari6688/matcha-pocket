@@ -23,6 +23,7 @@ export type TeaOrigin =
   | 'Nishio'
   | 'Kagoshima'
   | 'Shizuoka'
+  | 'Yame'
   | 'Other';
 
 /** Taste axes for the quadrant chart (0–1). */

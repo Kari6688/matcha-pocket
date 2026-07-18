@@ -34,13 +34,7 @@ export function TinDetail({ tin, onClose }: Props) {
         </button>
 
         <div className="tin-detail-hero">
-          <TinArt
-            skin={tin.skin}
-            brand={tin.brand}
-            name={tin.name}
-            size={216}
-            photoUrl={tin.photoUrl}
-          />
+          <TinArt brand={tin.brand} name={tin.name} size={216} photoUrl={tin.photoUrl} />
         </div>
 
         <div className="tin-detail-body">

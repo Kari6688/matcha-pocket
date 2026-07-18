@@ -67,3 +67,23 @@ export const Check = ({ size = 18, className }: IconProps) => (
     <path d="M20 6L9 17l-5-5" />
   </svg>
 );
+
+export const Heart = ({ size = 22, className }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={className}>
+    <path d="M20.8 5.6a5 5 0 00-7.1 0L12 7.3l-1.7-1.7a5 5 0 00-7.1 7.1l1.7 1.7L12 21.3l7.1-7.1 1.7-1.7a5 5 0 000-7.1z" />
+  </svg>
+);
+
+export const Locate = ({ size = 22, className }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={className}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 2v3M12 19v3M2 12h3M19 12h3" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="8" />
+  </svg>
+);
+
+export const Filter = ({ size = 22, className }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className={className}>
+    <path d="M4 6h16M7 12h10M10 18h4" />
+  </svg>
+);

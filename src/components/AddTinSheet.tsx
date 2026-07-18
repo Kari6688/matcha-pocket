@@ -11,8 +11,8 @@ interface Props {
   onSave: (tin: Omit<MatchaTin, 'id'>) => void;
 }
 
-const ORIGINS: TeaOrigin[] = ['Japan', 'Uji', 'Nishio', 'Kagoshima', 'Shizuoka', 'Other'];
-const SKINS: TinSkin[] = ['rocky', 'wako', 'jade', 'ember', 'ink', 'cream'];
+const ORIGINS: TeaOrigin[] = ['Japan', 'Uji', 'Nishio', 'Kagoshima', 'Shizuoka', 'Yame', 'Other'];
+const DEFAULT_SKIN: TinSkin = 'jade';
 
 export function AddTinSheet({ open, onClose, onSave }: Props) {
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -25,7 +25,7 @@ export function AddTinSheet({ open, onClose, onSave }: Props) {
   const [description, setDescription] = useState('');
   const [sweetness, setSweetness] = useState(0.5);
   const [richness, setRichness] = useState(0.5);
-  const [skin, setSkin] = useState<TinSkin>('jade');
+  const [skin] = useState<TinSkin>(DEFAULT_SKIN);
   const [photoUrl, setPhotoUrl] = useState<string | undefined>();
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoProgress, setPhotoProgress] = useState(0);
@@ -41,7 +41,6 @@ export function AddTinSheet({ open, onClose, onSave }: Props) {
     setDescription('');
     setSweetness(0.5);
     setRichness(0.5);
-    setSkin('jade');
     setPhotoUrl(undefined);
     setPhotoBusy(false);
     setPhotoProgress(0);
@@ -154,14 +153,12 @@ export function AddTinSheet({ open, onClose, onSave }: Props) {
 
         {photoUrl && !photoBusy && (
           <div className="tin-photo-preview">
-            <img src={photoUrl} alt="Tin cutout preview" />
+            <img src={photoUrl} alt="Tin photo preview" />
             <button type="button" className="photo-remove" onClick={() => setPhotoUrl(undefined)}>
               Remove photo
             </button>
           </div>
         )}
-
-        <p className="photo-hint">We’ll cut out the tin background automatically before saving.</p>
       </div>
 
       <div className="field">
@@ -232,24 +229,6 @@ export function AddTinSheet({ open, onClose, onSave }: Props) {
           }}
         />
       </div>
-
-      {!photoUrl && (
-        <div className="field">
-          <div className="field-label">Fallback tin look</div>
-          <div className="filter-row">
-            {SKINS.map((s) => (
-              <button
-                key={s}
-                type="button"
-                className={`filter-chip${skin === s ? ' active' : ''}`}
-                onClick={() => setSkin(s)}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <button className={`save-btn${canSave ? ' active' : ''}`} onClick={save} disabled={!canSave}>
         <Check size={18} />

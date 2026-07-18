@@ -11,7 +11,16 @@ interface Props {
   onAdd: () => void;
 }
 
-const ORIGINS: OriginFilter[] = ['all', 'Japan', 'Uji', 'Nishio', 'Kagoshima', 'Shizuoka', 'Other'];
+const ORIGINS: OriginFilter[] = [
+  'all',
+  'Japan',
+  'Uji',
+  'Nishio',
+  'Kagoshima',
+  'Shizuoka',
+  'Yame',
+  'Other',
+];
 
 export function CollectionPage({ items, onSelect, onAdd }: Props) {
   const [kind, setKind] = useState<KindFilter>('all');
@@ -39,7 +48,7 @@ export function CollectionPage({ items, onSelect, onAdd }: Props) {
   return (
     <div className="collection-page">
       <header className="collection-head">
-        <h1 className="collection-title">Your collection</h1>
+        <h1 className="collection-title">My collection</h1>
         <button type="button" className="collection-add" onClick={onAdd}>
           + Add tin
         </button>
@@ -112,13 +121,7 @@ export function CollectionPage({ items, onSelect, onAdd }: Props) {
             className="tin-card"
             onClick={() => onSelect(tin.id)}
           >
-            <TinArt
-              skin={tin.skin}
-              brand={tin.brand}
-              name={tin.name}
-              size={144}
-              photoUrl={tin.photoUrl}
-            />
+            <TinArt brand={tin.brand} name={tin.name} size={144} photoUrl={tin.photoUrl} />
             <div className="tin-meta">
               <div className="tin-brand">{tin.brand}</div>
               <div className="tin-name">{tin.name}</div>

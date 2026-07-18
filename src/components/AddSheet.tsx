@@ -15,6 +15,7 @@ interface Props {
   spots: Spot[];
   searchCenter: GeoPoint;
   regionId: RegionId;
+  initialPlace?: PlaceResult | null;
 }
 
 function placeKey(p: Pick<PlaceResult, 'name' | 'addr'>) {
@@ -91,7 +92,15 @@ function AcList({
   );
 }
 
-export function AddSheet({ open, onClose, onSave, spots, searchCenter, regionId }: Props) {
+export function AddSheet({
+  open,
+  onClose,
+  onSave,
+  spots,
+  searchCenter,
+  regionId,
+  initialPlace,
+}: Props) {
   const [name, setName] = useState('');
   const [addr, setAddr] = useState('');
   const [rating, setRating] = useState(0);
@@ -109,6 +118,19 @@ export function AddSheet({ open, onClose, onSave, spots, searchCenter, regionId 
     () => mergePlaces(localMatches, remoteResults),
     [localMatches, remoteResults],
   );
+
+  useEffect(() => {
+    if (!open || !initialPlace) return;
+    setName(initialPlace.name);
+    setAddr(initialPlace.addr);
+    setCoords(
+      initialPlace.lat != null && initialPlace.lng != null
+        ? [initialPlace.lat, initialPlace.lng]
+        : null,
+    );
+    setAcField(null);
+    setRemoteResults([]);
+  }, [open, initialPlace]);
 
   useEffect(() => {
     const q = activeQuery.trim();
