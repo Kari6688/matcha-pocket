@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from './auth';
+import {
+  fetchUserLibrary,
+  isMissingTableError,
+  mergeSpots,
+  mergeTins,
+  saveUserLibrary,
+} from './cloudSync';
 import { useLocationSettings } from './locationSettings';
 import { loadSpots, loadTins, nextNumericId, saveSpots, saveTins } from './storage';
 import type { AppTab, MatchaTin, Spot } from './types';
@@ -21,6 +28,8 @@ export default function App() {
   const { isLoaded, isSignedIn, isGuest, canEnterApp, userId, continueAsGuest } = useAuth();
   const location = useLocationSettings();
   const [dataUserId, setDataUserId] = useState<string | null>(null);
+  const [libraryReady, setLibraryReady] = useState(false);
+  const [syncNote, setSyncNote] = useState<string | null>(null);
 
   const [spots, setSpots] = useState<Spot[]>([]);
   const [collection, setCollection] = useState<MatchaTin[]>([]);
@@ -44,30 +53,89 @@ export default function App() {
       setSpots([]);
       setCollection([]);
       setDataUserId(null);
+      setLibraryReady(false);
+      setSyncNote(null);
       setSelectedId(null);
       setSelectedTinId(null);
       setAddOpen(false);
       setAddTinOpen(false);
       return;
     }
-    const nextSpots = loadSpots(userId);
-    const nextTins = loadTins(userId);
-    setSpots(nextSpots);
-    setCollection(nextTins);
-    spotIdRef.current = nextNumericId(nextSpots, 's', 1);
-    tinIdRef.current = nextNumericId(nextTins, 't', 1);
-    setDataUserId(userId);
+
+    let cancelled = false;
+    setLibraryReady(false);
+    setSyncNote(null);
+
+    const localSpots = loadSpots(userId);
+    const localTins = loadTins(userId);
+    setSpots(localSpots);
+    setCollection(localTins);
+    spotIdRef.current = nextNumericId(localSpots, 's', 1);
+    tinIdRef.current = nextNumericId(localTins, 't', 1);
+
+    (async () => {
+      try {
+        const remote = await fetchUserLibrary(userId);
+        if (cancelled) return;
+        const mergedSpots = mergeSpots(localSpots, remote?.spots ?? []);
+        const mergedTins = mergeTins(localTins, remote?.tins ?? []);
+        setSpots(mergedSpots);
+        setCollection(mergedTins);
+        spotIdRef.current = nextNumericId(mergedSpots, 's', 1);
+        tinIdRef.current = nextNumericId(mergedTins, 't', 1);
+        saveSpots(userId, mergedSpots);
+        saveTins(userId, mergedTins);
+
+        const remoteEmpty = !(remote?.spots.length || remote?.tins.length);
+        const hasData = mergedSpots.length > 0 || mergedTins.length > 0;
+        const changed =
+          mergedSpots.length !== (remote?.spots.length ?? 0) ||
+          mergedTins.length !== (remote?.tins.length ?? 0);
+        if (hasData && (remoteEmpty || changed)) {
+          await saveUserLibrary(userId, mergedSpots, mergedTins);
+        }
+      } catch (err) {
+        console.error(err);
+        if (!cancelled) {
+          if (isMissingTableError(err)) {
+            setSyncNote(
+              'Cloud sync isn’t set up yet — run supabase/user_library.sql in the Supabase SQL Editor.',
+            );
+          } else {
+            setSyncNote('Couldn’t reach cloud sync. Spots still save on this device.');
+          }
+        }
+      } finally {
+        if (!cancelled) {
+          setDataUserId(userId);
+          setLibraryReady(true);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [userId, isLoaded]);
 
   useEffect(() => {
-    if (!dataUserId || dataUserId !== userId) return;
+    if (!libraryReady || !dataUserId || dataUserId !== userId) return;
     saveSpots(dataUserId, spots);
-  }, [spots, dataUserId, userId]);
-
-  useEffect(() => {
-    if (!dataUserId || dataUserId !== userId) return;
     saveTins(dataUserId, collection);
-  }, [collection, dataUserId, userId]);
+
+    const handle = window.setTimeout(() => {
+      void saveUserLibrary(dataUserId, spots, collection).catch((err) => {
+        console.error(err);
+        if (isMissingTableError(err)) {
+          setSyncNote(
+            'Cloud sync isn’t set up yet — run supabase/user_library.sql in the Supabase SQL Editor.',
+          );
+        }
+      });
+    }, 700);
+
+    return () => window.clearTimeout(handle);
+  }, [spots, collection, libraryReady, dataUserId, userId]);
 
   const selected = spots.find((s) => s.id === selectedId) ?? null;
   const selectedTin = collection.find((t) => t.id === selectedTinId) ?? null;
@@ -196,6 +264,7 @@ export default function App() {
           tinCount={isSignedIn ? collection.length : 0}
           isGuest={isGuest}
           onRequestSignUp={() => setAuthPromptOpen(true)}
+          syncNote={syncNote}
         />
       )}
 

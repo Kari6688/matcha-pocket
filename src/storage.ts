@@ -48,6 +48,9 @@ function isTin(t: unknown): t is MatchaTin {
   );
 }
 
+export const isSpotLike = isSpot;
+export const isTinLike = isTin;
+
 /** Load spots for a signed-in user. Migrates older device-only data once. */
 export function loadSpots(userId: string): Spot[] {
   const stored = readJson<Spot[]>(spotsKey(userId));

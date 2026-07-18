@@ -6,9 +6,16 @@ interface Props {
   tinCount: number;
   isGuest?: boolean;
   onRequestSignUp?: () => void;
+  syncNote?: string | null;
 }
 
-export function ProfilePage({ spotCount, tinCount, isGuest, onRequestSignUp }: Props) {
+export function ProfilePage({
+  spotCount,
+  tinCount,
+  isGuest,
+  onRequestSignUp,
+  syncNote,
+}: Props) {
   const { isSignedIn, email, signOut } = useAuth();
 
   return (
@@ -58,8 +65,9 @@ export function ProfilePage({ spotCount, tinCount, isGuest, onRequestSignUp }: P
             </div>
           </div>
           <p className="profile-note">
-            Your spots and tins are stored on this device under your account.
+            Your spots and tins sync to your account across devices when you’re online.
           </p>
+          {syncNote && <p className="profile-sync-note">{syncNote}</p>}
         </>
       )}
     </div>
