@@ -1,12 +1,12 @@
 :root {
-  --brand:        #00CD00;
-  --brand-strong: #00b800;
-  --brand-soft:   #00a300;
-  --brand-glow:   rgba(0, 205, 0, 0.28);
-  --pin-bg:       #e9ffe9;
-  --sage-bg:      #f4faf4;
-  --sage-border:  #d8e8d8;
-  --sage-disabled:#c5d5c5;
+  --brand:        #035A32;
+  --brand-strong: #024726;
+  --brand-soft:   #047040;
+  --brand-glow:   rgba(3, 90, 50, 0.28);
+  --pin-bg:       #e7efe9;
+  --sage-bg:      #f2f6f3;
+  --sage-border:  #d0ddd4;
+  --sage-disabled:#c2cfc6;
   --text:         #111111;
   --muted:        #6b6b6b;
   --muted-2:      #9a9a9a;
@@ -18,46 +18,162 @@
   --page:         #fafafa;
   --welcome-bg:   #ffffff;
   --welcome-logo: #111111;
-  --font:         'PP Neue Montreal Mono', 'PP Neue Montreal', ui-monospace, monospace;
+  --font:         'PP Neue Montreal Mono', ui-monospace, monospace;
   --font-mono:    var(--font);
-  --font-serif:   var(--font);
+  --font-display: 'PP Kyoto', Georgia, 'Times New Roman', serif;
+  --font-serif:   var(--font-display);
   --nav-h:        64px;
+  --nav-bottom:   calc(18px + env(safe-area-inset-bottom, 0px));
 }
 
+/* PP Kyoto — headers */
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-ThinItalic.otf') format('opentype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-LightItalic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-Light.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-LightItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-MediumItalic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-Medium.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-MediumItalic.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-Extrabold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-ExtraboldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-Extrabold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Kyoto';
+  src: url('/fonts/PPKyoto-ExtraboldItalic.otf') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* PP Neue Montreal Mono — body / UI */
 @font-face {
   font-family: 'PP Neue Montreal Mono';
-  src: local('PP Neue Montreal Mono'),
-    url('/fonts/PPNeueMontrealMono-Regular.woff2') format('woff2'),
-    url('/fonts/PPNeueMontrealMono-Regular.woff') format('woff');
+  src: url('/fonts/PPNeueMontrealMono-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Montreal Mono';
+  src: url('/fonts/PPNeueMontrealMono-Book.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'PP Neue Montreal Mono';
-  src: local('PP Neue Montreal Mono Medium'),
-    url('/fonts/PPNeueMontrealMono-Medium.woff2') format('woff2'),
-    url('/fonts/PPNeueMontrealMono-Medium.woff') format('woff');
+  src: url('/fonts/PPNeueMontrealMono-RegularItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Montreal Mono';
+  src: url('/fonts/PPNeueMontrealMono-Medium.otf') format('opentype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'PP Neue Montreal Mono';
-  src: local('PP Neue Montreal Mono SemiBold'),
-    url('/fonts/PPNeueMontrealMono-SemiBold.woff2') format('woff2'),
-    url('/fonts/PPNeueMontrealMono-SemiBold.woff') format('woff');
+  src: url('/fonts/PPNeueMontrealMono-Medium.otf') format('opentype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'PP Neue Montreal Mono';
-  src: local('PP Neue Montreal Mono Bold'),
-    url('/fonts/PPNeueMontrealMono-Bold.woff2') format('woff2'),
-    url('/fonts/PPNeueMontrealMono-Bold.woff') format('woff');
+  src: url('/fonts/PPNeueMontrealMono-Bold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Montreal Mono';
+  src: url('/fonts/PPNeueMontrealMono-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
   font-display: swap;
 }
 
@@ -85,11 +201,33 @@ body {
   overflow: hidden;
 }
 
-/* ---------- Sidebar ---------- */
+/* ---------- Sidebar / Favorites ---------- */
 .sidebar {
   width: 400px; min-width: 400px; background: var(--white);
   height: 100%; display: flex; flex-direction: column; z-index: 500;
   box-shadow: 1px 0 0 rgba(0,0,0,0.04);
+}
+
+/* Desktop: favorites panel only when opened from the heart icon */
+@media (min-width: 769px) {
+  .sidebar:not(.drawer-open) {
+    display: none;
+  }
+
+  .sidebar.drawer-open {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: min(400px, 92vw);
+    min-width: 0;
+    z-index: 700;
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .app.drawer-expanded .map-wrap {
+    width: 100%;
+  }
 }
 .sidebar-top { padding: 22px 22px 0; }
 
@@ -97,7 +235,7 @@ body {
 .brand { display: flex; align-items: center; gap: 9px; }
 .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brand); }
 .brand-name {
-  font-family: var(--font);
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -170,7 +308,7 @@ body {
 }
 
 .auth-wall-title {
-  font-family: var(--font);
+  font-family: var(--font-display);
   font-size: 28px;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -297,7 +435,7 @@ body {
 
 .welcome-title {
   margin: 0;
-  font-family: var(--font);
+  font-family: var(--font-display);
   font-size: clamp(28px, 7vw, 36px);
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -553,7 +691,7 @@ body {
 }
 
 .setup-missing h1 {
-  font-family: var(--font);
+  font-family: var(--font-display);
   font-size: 36px;
   margin: 0;
 }
@@ -600,7 +738,14 @@ body {
 .spot-card:hover { background: #f7faf6; border-color: var(--sage-border); }
 .spot-pin {
   width: 42px; height: 42px; min-width: 42px; border-radius: 50%;
-  background: var(--pin-bg); display: flex; align-items: center; justify-content: center; color: var(--brand);
+  background: var(--pin-bg); display: flex; align-items: center; justify-content: center;
+  overflow: hidden; padding: 6px;
+}
+.spot-pin-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 .spot-body { flex: 1; min-width: 0; }
 .spot-name { font-size: 15.5px; font-weight: 700; line-height: 1.2; }
@@ -679,7 +824,7 @@ body {
   border-radius: 50%;
   border: none;
   background: var(--brand);
-  color: #111;
+  color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -859,7 +1004,12 @@ body {
 .grabber { width: 46px; height: 5px; border-radius: 999px; background: #e0e0e0; margin: 2px auto 18px; }
 
 .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; }
-.sheet-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.sheet-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
 .x-btn {
   border: none; background: none; cursor: pointer; color: #9aa79f;
   width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px;
@@ -912,7 +1062,11 @@ body {
 .punch-head { display: flex; align-items: center; justify-content: space-between; }
 .punch-head-left { display: flex; align-items: center; gap: 10px; }
 .punch-head-left .pc-icon { color: var(--brand); display: flex; }
-.punch-head-left .pc-title { font-size: 17px; font-weight: 700; }
+.punch-head-left .pc-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+}
 .punch-head-left .pc-visits { font-size: 14px; color: var(--muted); font-weight: 500; }
 .punch-actions { display: flex; align-items: center; gap: 10px; }
 .round-btn {
@@ -922,7 +1076,7 @@ body {
 }
 .round-btn:hover { background: #f4f7f3; }
 .punch-btn {
-  display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #1a1516;
+  display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #fff;
   border: none; border-radius: 12px; padding: 10px 18px; font-size: 15px; font-weight: 600;
   cursor: pointer; font-family: inherit;
 }
@@ -991,14 +1145,14 @@ body {
   cursor: not-allowed; font-family: inherit; display: flex; align-items: center; justify-content: center;
   gap: 9px; transition: background .2s;
 }
-.save-btn.active { background: var(--brand); color: #111; cursor: pointer; }
+.save-btn.active { background: var(--brand); color: #fff; cursor: pointer; }
 .save-btn.active:hover { background: var(--brand-strong); }
 
 /* ---------- Bottom capsule nav (screenshot reference) ---------- */
 .app-nav-zone {
   position: fixed;
   left: 50%;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  bottom: var(--nav-bottom);
   top: auto;
   transform: translateX(-50%);
   z-index: 800;
@@ -1058,17 +1212,6 @@ body {
   line-height: 1;
 }
 
-.app-nav-btn.show-divider::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 28%;
-  bottom: 28%;
-  width: 1px;
-  background: #e5e5e5;
-  pointer-events: none;
-}
-
 .app-nav-btn.active {
   background: transparent;
   color: #ffffff;
@@ -1091,11 +1234,11 @@ body {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .collection-title {
-  font-family: var(--font);
+  font-family: var(--font-display);
   font-size: clamp(36px, 8vw, 52px);
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -1122,8 +1265,16 @@ body {
 .collection-toolbar {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin: 4px 0 18px;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.collection-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .filter-toggle {
@@ -1381,7 +1532,7 @@ body {
 }
 
 .tin-detail-name {
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 600;
   margin-top: 4px;
@@ -1507,9 +1658,8 @@ body {
 
 .photo-action-btn {
   flex: 1;
-  border: 1.5px solid var(--brand);
   background: var(--brand);
-  color: #111;
+  color: #fff;
   border-radius: 12px;
   padding: 14px 12px;
   font-family: var(--font-mono);
@@ -1522,6 +1672,7 @@ body {
 .photo-action-btn.secondary {
   background: #fff;
   border-color: var(--card-border);
+  color: #111;
 }
 
 .photo-action-btn:disabled {
@@ -1585,9 +1736,14 @@ body {
 }
 
 .tin-photo-preview img {
-  max-width: 180px;
-  max-height: 220px;
+  max-width: 270px;
+  max-height: 330px;
   object-fit: contain;
+}
+
+.tin-photo-preview-actions {
+  display: flex;
+  gap: 14px;
 }
 
 .photo-remove {
@@ -1599,6 +1755,93 @@ body {
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
+}
+
+.photo-crop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-crop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
+  background: #111;
+  color: #fff;
+}
+
+.photo-crop-head .x-btn {
+  color: #fff;
+}
+
+.photo-crop-head .x-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.photo-crop-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.photo-crop-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 40px;
+}
+
+.photo-crop-done:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.photo-crop-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: #000;
+}
+
+.photo-crop-controls {
+  padding: 16px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: #111;
+  color: #fff;
+}
+
+.photo-crop-zoom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.photo-crop-zoom input[type='range'] {
+  width: 100%;
+  accent-color: var(--brand);
+}
+
+.photo-crop-controls .photo-hint {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .tin-photo-wrap {
@@ -1630,14 +1873,19 @@ body {
   align-items: center; justify-content: center;
 }
 .loc-prompt-body { flex: 1; min-width: 0; }
-.loc-prompt-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.loc-prompt-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
 .loc-prompt-text { margin-top: 4px; font-size: 13.5px; color: var(--muted); line-height: 1.45; }
 .loc-prompt-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .loc-prompt-primary, .loc-prompt-secondary {
   border: none; border-radius: 10px; padding: 10px 14px; font-size: 13.5px;
   font-weight: 600; font-family: inherit; cursor: pointer;
 }
-.loc-prompt-primary { background: var(--brand); color: #111; }
+.loc-prompt-primary { background: var(--brand); color: #fff; }
 .loc-prompt-primary:hover { background: var(--brand-strong); }
 .loc-prompt-secondary { background: var(--sage-bg); color: var(--brand-soft); border: 1px solid var(--sage-border); }
 .loc-prompt-secondary:hover { background: #e4efe4; }
@@ -1653,7 +1901,11 @@ body {
   box-shadow: 0 16px 40px rgba(20, 40, 28, .14);
 }
 .loc-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.loc-panel-title { font-size: 17px; font-weight: 700; }
+.loc-panel-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+}
 .loc-panel-sub { margin-top: 3px; font-size: 13px; color: var(--muted); }
 .loc-device-btn {
   width: 100%; margin-top: 16px; display: flex; align-items: center; gap: 10px;
@@ -1674,15 +1926,15 @@ body {
   color: #3a4540; cursor: pointer;
 }
 .loc-city:hover { border-color: var(--sage-border); background: #f7faf6; }
-.loc-city.active { background: var(--brand); border-color: var(--brand); color: #111; }
+.loc-city.active { background: var(--brand); border-color: var(--brand); color: #fff; }
 
 @media (max-width: 768px) {
   .loc-prompt {
-    bottom: calc(var(--drawer-peek) + 16px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(var(--nav-h) + 16px + env(safe-area-inset-bottom, 0px));
   }
   .app.drawer-expanded .loc-prompt { display: none; }
   .loc-panel {
-    left: 16px; right: 16px; top: auto; bottom: calc(var(--drawer-peek) + 16px);
+    left: 16px; right: 16px; top: auto; bottom: calc(var(--nav-h) + 16px);
     width: auto;
   }
 }
@@ -1694,8 +1946,8 @@ body {
 
 @media (max-width: 768px) {
   :root {
-    --drawer-peek: 112px;
-    --drawer-expanded: min(64vh, 480px);
+    --drawer-peek: 0px;
+    --drawer-expanded: min(72vh, 520px);
     --fab-offset: 24px;
     --nav-h: 56px;
   }
@@ -1734,17 +1986,21 @@ body {
     z-index: 500;
     border-radius: 22px 22px 0 0;
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
-    transform: translateY(calc(100% - var(--drawer-peek)));
+    transform: translateY(100%);
     transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
     padding-bottom: env(safe-area-inset-bottom, 0px);
     touch-action: pan-y;
     will-change: transform;
     user-select: none;
     background: var(--white);
+    pointer-events: none;
+    visibility: hidden;
   }
 
   .sidebar.drawer-open {
     transform: translateY(0);
+    pointer-events: auto;
+    visibility: visible;
   }
 
   .sidebar.drawer-dragging {
@@ -1780,10 +2036,7 @@ body {
   }
 
   .drawer-hint {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    color: var(--muted-2);
+    display: none;
   }
 
   .sidebar-top {
@@ -1810,19 +2063,19 @@ body {
 
   .app-nav-zone {
     top: auto;
-    bottom: calc(var(--drawer-peek) + 14px + env(safe-area-inset-bottom, 0px));
+    bottom: var(--nav-bottom);
     max-width: calc(100vw - 28px);
   }
 
   .app.drawer-expanded .app-nav-zone {
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    bottom: var(--nav-bottom);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
   }
 
   .app.tab-page .app-nav-zone {
-    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    bottom: var(--nav-bottom);
     opacity: 1;
     pointer-events: none;
   }
@@ -1870,12 +2123,8 @@ body {
   .map-fab-stack {
     position: fixed;
     right: 16px;
-    bottom: calc(var(--drawer-peek) + var(--fab-offset) + env(safe-area-inset-bottom, 0px));
+    bottom: calc(var(--nav-h) + var(--fab-offset) + env(safe-area-inset-bottom, 0px));
     z-index: 450;
-  }
-
-  .app.drawer-expanded .map-fab-stack {
-    bottom: calc(var(--drawer-expanded) + var(--fab-offset) + env(safe-area-inset-bottom, 0px));
   }
 
   .map-search {
@@ -1889,11 +2138,11 @@ body {
   }
 
   .loc-prompt {
-    bottom: calc(var(--drawer-peek) + 16px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: calc(var(--nav-h) + 16px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .loc-panel {
-    bottom: calc(var(--drawer-peek) + 16px) !important;
+    bottom: calc(var(--nav-h) + 16px) !important;
   }
 
   .leaflet-control-zoom {

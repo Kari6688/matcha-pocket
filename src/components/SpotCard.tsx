@@ -1,5 +1,5 @@
 import type { Spot } from '../types';
-import { PinFilled, CardIcon, Chevron } from './icons';
+import { CardIcon, Chevron } from './icons';
 import { Stars } from './Stars';
 
 interface Props {
@@ -11,7 +11,7 @@ export function SpotCard({ spot, onClick }: Props) {
   return (
     <div className="spot-card" onClick={onClick}>
       <div className="spot-pin">
-        <PinFilled size={22} />
+        <img className="spot-pin-img" src="/icon-spot.png" alt="" draggable={false} />
       </div>
       <div className="spot-body">
         <div className="spot-name">{spot.name}</div>

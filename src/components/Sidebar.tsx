@@ -150,19 +150,18 @@ export function Sidebar({
       <button
         type="button"
         className="drawer-handle"
-        aria-label={open ? 'Swipe down to collapse spots' : 'Swipe up to expand spots'}
+        aria-label={open ? 'Swipe down to close favorites' : 'Favorites'}
         onClick={() => {
           if (movedRef.current) return;
-          setOpen(!open);
+          setOpen(false);
         }}
       >
         <span className="drawer-grabber" aria-hidden />
-        <span className="drawer-hint">{open ? 'Swipe down' : 'Swipe up for spots'}</span>
       </button>
       <div className="sidebar-top">
         <div className="brand-row">
           <div className="brand">
-            <span className="brand-name">{open ? 'Favorites' : 'Matcha Pocket'}</span>
+            <span className="brand-name">Favorites</span>
           </div>
           <AuthControls />
         </div>

@@ -34,12 +34,17 @@ export function blobToDataUrl(blob: Blob): Promise<string> {
 /**
  * Removes the photo background in-browser (no upload to our servers).
  * First run may download a small AI model.
+ * Accepts File or Blob (e.g. after cropping).
  */
 export async function removePhotoBackground(
-  file: File,
+  source: File | Blob,
   onProgress?: (pct: number) => void,
 ): Promise<string> {
   onProgress?.(5);
+  const file =
+    source instanceof File
+      ? source
+      : new File([source], 'crop.jpg', { type: source.type || 'image/jpeg' });
   const scaled = await downscaleImage(file);
   onProgress?.(20);
 

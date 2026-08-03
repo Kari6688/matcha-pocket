@@ -49,28 +49,30 @@ export function CollectionPage({ items, onSelect, onAdd }: Props) {
     <div className="collection-page">
       <header className="collection-head">
         <h1 className="collection-title">My collection</h1>
-        <button type="button" className="collection-add" onClick={onAdd}>
-          + Add tin
-        </button>
       </header>
 
       <div className="collection-toolbar">
-        <button
-          type="button"
-          className={`filter-toggle${filtersOpen || hasFilters ? ' active' : ''}`}
-          aria-expanded={filtersOpen}
-          onClick={() => setFiltersOpen((v) => !v)}
-        >
-          Filter{hasFilters ? ` · ${activeCount}` : ''}
-          <span className="filter-toggle-chevron" aria-hidden>
-            {filtersOpen ? '▴' : '▾'}
-          </span>
-        </button>
-        {hasFilters && !filtersOpen && (
-          <button type="button" className="filter-clear" onClick={clearFilters}>
-            Clear
+        <div className="collection-toolbar-left">
+          <button
+            type="button"
+            className={`filter-toggle${filtersOpen || hasFilters ? ' active' : ''}`}
+            aria-expanded={filtersOpen}
+            onClick={() => setFiltersOpen((v) => !v)}
+          >
+            Filter{hasFilters ? ` · ${activeCount}` : ''}
+            <span className="filter-toggle-chevron" aria-hidden>
+              {filtersOpen ? '▴' : '▾'}
+            </span>
           </button>
-        )}
+          {hasFilters && !filtersOpen && (
+            <button type="button" className="filter-clear" onClick={clearFilters}>
+              Clear
+            </button>
+          )}
+        </div>
+        <button type="button" className="collection-add" onClick={onAdd}>
+          + Add tin
+        </button>
       </div>
 
       {filtersOpen && (

@@ -63,8 +63,6 @@ export function BottomNav({ active, onChange }: Props) {
           }}
         />
         {TABS.map((tab, i) => {
-          const showDivider =
-            i > 0 && active !== tab.id && active !== TABS[i - 1]?.id;
           return (
             <button
               key={tab.id}
@@ -74,9 +72,7 @@ export function BottomNav({ active, onChange }: Props) {
               ref={(el) => {
                 btnRefs.current[i] = el;
               }}
-              className={`app-nav-btn${active === tab.id ? ' active' : ''}${
-                showDivider ? ' show-divider' : ''
-              }`}
+              className={`app-nav-btn${active === tab.id ? ' active' : ''}`}
               onClick={() => onChange(tab.id)}
             >
               {tab.label}

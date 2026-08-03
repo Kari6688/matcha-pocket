@@ -1,6 +1,7 @@
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import type { MatchaTin, TeaKind, TeaOrigin, TinSkin } from '../types';
 import { removePhotoBackground } from '../tinPhoto';
+import { PhotoCrop } from './PhotoCrop';
 import { Sheet } from './Sheet';
 import { TasteQuadrant } from './TasteQuadrant';
 import { Close, Check } from './icons';
@@ -17,6 +18,7 @@ const DEFAULT_SKIN: TinSkin = 'jade';
 export function AddTinSheet({ open, onClose, onSave }: Props) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const libraryRef = useRef<HTMLInputElement>(null);
+  const cropUrlRef = useRef<string | null>(null);
 
   const [brand, setBrand] = useState('');
   const [name, setName] = useState('');
@@ -30,8 +32,17 @@ export function AddTinSheet({ open, onClose, onSave }: Props) {
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoProgress, setPhotoProgress] = useState(0);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
 
-  const canSave = brand.trim() && name.trim() && !photoBusy;
+  const canSave = brand.trim() && name.trim() && !photoBusy && !cropSrc;
+
+  const clearCropSrc = () => {
+    if (cropUrlRef.current) {
+      URL.revokeObjectURL(cropUrlRef.current);
+      cropUrlRef.current = null;
+    }
+    setCropSrc(null);
+  };
 
   const reset = () => {
     setBrand('');
@@ -45,29 +56,40 @@ export function AddTinSheet({ open, onClose, onSave }: Props) {
     setPhotoBusy(false);
     setPhotoProgress(0);
     setPhotoError(null);
+    clearCropSrc();
   };
 
-  const processFile = async (file: File | undefined) => {
-    if (!file || !file.type.startsWith('image/')) return;
+  useEffect(() => {
+    if (!open) clearCropSrc();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const processCropped = async (blob: Blob) => {
+    clearCropSrc();
     setPhotoError(null);
     setPhotoBusy(true);
     setPhotoProgress(0);
     try {
-      const cutout = await removePhotoBackground(file, setPhotoProgress);
+      const cutout = await removePhotoBackground(blob, setPhotoProgress);
       setPhotoUrl(cutout);
     } catch (err) {
       console.error(err);
-      setPhotoError('Couldn’t remove the background. Try another photo or better lighting.');
+      setPhotoError('Couldn’t process the photo. Try another shot or crop again.');
     } finally {
       setPhotoBusy(false);
       setPhotoProgress(0);
     }
   };
 
-  const onPick = async (e: ChangeEvent<HTMLInputElement>) => {
+  const onPick = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
-    await processFile(file);
+    if (!file || !file.type.startsWith('image/')) return;
+    clearCropSrc();
+    setPhotoError(null);
+    const url = URL.createObjectURL(file);
+    cropUrlRef.current = url;
+    setCropSrc(url);
   };
 
   const save = () => {
@@ -86,154 +108,176 @@ export function AddTinSheet({ open, onClose, onSave }: Props) {
   };
 
   return (
-    <Sheet
-      open={open}
-      onClose={() => {
-        reset();
-        onClose();
-      }}
-    >
-      <div className="sheet-head">
-        <div className="sheet-title">Add tin</div>
-        <button
-          className="x-btn"
-          onClick={() => {
-            reset();
-            onClose();
-          }}
-        >
-          <Close size={20} />
+    <>
+      <Sheet
+        open={open && !cropSrc}
+        onClose={() => {
+          reset();
+          onClose();
+        }}
+      >
+        <div className="sheet-head">
+          <div className="sheet-title">Add tin</div>
+          <button
+            className="x-btn"
+            onClick={() => {
+              reset();
+              onClose();
+            }}
+          >
+            <Close size={20} />
+          </button>
+        </div>
+
+        <div className="field">
+          <div className="field-label">Tin photo</div>
+          <div className="tin-photo-actions">
+            <button
+              type="button"
+              className="photo-action-btn"
+              disabled={photoBusy}
+              onClick={() => cameraRef.current?.click()}
+            >
+              Take photo
+            </button>
+            <button
+              type="button"
+              className="photo-action-btn secondary"
+              disabled={photoBusy}
+              onClick={() => libraryRef.current?.click()}
+            >
+              Choose photo
+            </button>
+          </div>
+          <input
+            ref={cameraRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="sr-only"
+            onChange={onPick}
+          />
+          <input
+            ref={libraryRef}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={onPick}
+          />
+
+          {photoBusy && (
+            <div className="photo-progress" role="status">
+              <div className="photo-progress-bar" style={{ width: `${photoProgress}%` }} />
+              <span>Processing photo… {photoProgress}%</span>
+            </div>
+          )}
+
+          {photoError && <p className="photo-error">{photoError}</p>}
+
+          {photoUrl && !photoBusy && (
+            <div className="tin-photo-preview">
+              <img src={photoUrl} alt="Tin photo preview" />
+              <div className="tin-photo-preview-actions">
+                <button
+                  type="button"
+                  className="photo-remove"
+                  onClick={() => {
+                    setPhotoUrl(undefined);
+                    libraryRef.current?.click();
+                  }}
+                >
+                  Recrop
+                </button>
+                <button type="button" className="photo-remove" onClick={() => setPhotoUrl(undefined)}>
+                  Remove
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="field">
+          <div className="field-label">Brand</div>
+          <input
+            className="input"
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
+            placeholder="e.g. Marukyu Koyamaen"
+          />
+        </div>
+        <div className="field">
+          <div className="field-label">Name / Blend</div>
+          <input
+            className="input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Wako"
+          />
+        </div>
+        <div className="field">
+          <div className="field-label">Type</div>
+          <div className="filter-row">
+            {(['matcha', 'hojicha'] as TeaKind[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                className={`filter-chip${kind === k ? ' active' : ''}`}
+                onClick={() => setKind(k)}
+              >
+                {k === 'matcha' ? 'Matcha' : 'Hojicha'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="field">
+          <div className="field-label">Origin</div>
+          <div className="filter-row">
+            {ORIGINS.map((o) => (
+              <button
+                key={o}
+                type="button"
+                className={`filter-chip${origin === o ? ' active' : ''}`}
+                onClick={() => setOrigin(o)}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="field">
+          <div className="field-label">Notes</div>
+          <textarea
+            className="textarea"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Flavor notes…"
+          />
+        </div>
+        <div className="field">
+          <div className="field-label">Taste</div>
+          <p className="photo-hint">Drag the dot — rich/soft, umami/sweetness.</p>
+          <TasteQuadrant
+            taste={{ sweetness, richness }}
+            onChange={(t) => {
+              setSweetness(t.sweetness);
+              setRichness(t.richness);
+            }}
+          />
+        </div>
+
+        <button className={`save-btn${canSave ? ' active' : ''}`} onClick={save} disabled={!canSave}>
+          <Check size={18} />
+          Save tin
         </button>
-      </div>
+      </Sheet>
 
-      <div className="field">
-        <div className="field-label">Tin photo</div>
-        <div className="tin-photo-actions">
-          <button
-            type="button"
-            className="photo-action-btn"
-            disabled={photoBusy}
-            onClick={() => cameraRef.current?.click()}
-          >
-            Take photo
-          </button>
-          <button
-            type="button"
-            className="photo-action-btn secondary"
-            disabled={photoBusy}
-            onClick={() => libraryRef.current?.click()}
-          >
-            Choose photo
-          </button>
-        </div>
-        <input
-          ref={cameraRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="sr-only"
-          onChange={onPick}
+      {cropSrc && (
+        <PhotoCrop
+          imageSrc={cropSrc}
+          onCancel={clearCropSrc}
+          onConfirm={(blob) => void processCropped(blob)}
         />
-        <input
-          ref={libraryRef}
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          onChange={onPick}
-        />
-
-        {photoBusy && (
-          <div className="photo-progress" role="status">
-            <div className="photo-progress-bar" style={{ width: `${photoProgress}%` }} />
-            <span>Removing background… {photoProgress}%</span>
-          </div>
-        )}
-
-        {photoError && <p className="photo-error">{photoError}</p>}
-
-        {photoUrl && !photoBusy && (
-          <div className="tin-photo-preview">
-            <img src={photoUrl} alt="Tin photo preview" />
-            <button type="button" className="photo-remove" onClick={() => setPhotoUrl(undefined)}>
-              Remove photo
-            </button>
-          </div>
-        )}
-      </div>
-
-      <div className="field">
-        <div className="field-label">Brand</div>
-        <input
-          className="input"
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-          placeholder="e.g. Marukyu Koyamaen"
-        />
-      </div>
-      <div className="field">
-        <div className="field-label">Name / Blend</div>
-        <input
-          className="input"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Wako"
-        />
-      </div>
-      <div className="field">
-        <div className="field-label">Type</div>
-        <div className="filter-row">
-          {(['matcha', 'hojicha'] as TeaKind[]).map((k) => (
-            <button
-              key={k}
-              type="button"
-              className={`filter-chip${kind === k ? ' active' : ''}`}
-              onClick={() => setKind(k)}
-            >
-              {k === 'matcha' ? 'Matcha' : 'Hojicha'}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="field">
-        <div className="field-label">Origin</div>
-        <div className="filter-row">
-          {ORIGINS.map((o) => (
-            <button
-              key={o}
-              type="button"
-              className={`filter-chip${origin === o ? ' active' : ''}`}
-              onClick={() => setOrigin(o)}
-            >
-              {o}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="field">
-        <div className="field-label">Notes</div>
-        <textarea
-          className="textarea"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Flavor notes…"
-        />
-      </div>
-      <div className="field">
-        <div className="field-label">Taste</div>
-        <p className="photo-hint">Drag the dot — rich/soft, umami/sweetness.</p>
-        <TasteQuadrant
-          taste={{ sweetness, richness }}
-          onChange={(t) => {
-            setSweetness(t.sweetness);
-            setRichness(t.richness);
-          }}
-        />
-      </div>
-
-      <button className={`save-btn${canSave ? ' active' : ''}`} onClick={save} disabled={!canSave}>
-        <Check size={18} />
-        Save tin
-      </button>
-    </Sheet>
+      )}
+    </>
   );
 }
