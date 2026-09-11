@@ -178,8 +178,11 @@ export default function App() {
 
   const locateUser = () => {
     if (location.deviceLocation) {
+      // Recenter on what we have now, then refresh in the background — the
+      // position may be remembered from a previous visit.
       setFocus({ lat: location.deviceLocation.lat, lng: location.deviceLocation.lng });
       setRecenterKey((n) => n + 1);
+      location.requestDeviceLocation();
       return;
     }
     location.enableDeviceLocation();
@@ -343,6 +346,7 @@ export default function App() {
         regionId={location.regionId}
         mode={location.mode}
         geoStatus={location.geoStatus}
+        usingDevice={location.usingDevice}
         onEnableDevice={() => {
           location.enableDeviceLocation();
           goToArea();

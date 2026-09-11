@@ -9,6 +9,8 @@ interface Props {
   regionId: RegionId;
   mode: LocationMode;
   geoStatus: GeoStatus;
+  /** True once we have a position for the device — live or remembered from last visit. */
+  usingDevice: boolean;
   onEnableDevice: () => void;
   onSelectRegion: (id: RegionId) => void;
   onClose: () => void;
@@ -20,13 +22,12 @@ export function LocationSettings({
   regionId,
   mode,
   geoStatus,
+  usingDevice,
   onEnableDevice,
   onSelectRegion,
   onClose,
 }: Props) {
   if (!open) return null;
-
-  const usingDevice = mode === 'device' && geoStatus === 'granted';
 
   return (
     <div className="loc-panel" role="dialog" aria-label="Location settings">
