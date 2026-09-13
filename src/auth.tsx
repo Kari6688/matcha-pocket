@@ -107,6 +107,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = useCallback(() => signInWithOAuth('google'), [signInWithOAuth]);
+  // Kept deliberately: Apple has no button right now (it needs a paid Apple
+  // Developer membership), but the provider is a one-liner over the shared
+  // OAuth helper, so bringing the button back is a UI-only change.
   const signInWithApple = useCallback(() => signInWithOAuth('apple'), [signInWithOAuth]);
 
   const signInWithEmail = useCallback(async (email: string) => {
