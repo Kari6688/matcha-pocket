@@ -11,7 +11,6 @@ interface Props {
 
 interface ProviderFlags {
   google: boolean;
-  apple: boolean;
   email: boolean;
 }
 
@@ -26,11 +25,9 @@ type ProviderState =
   | { state: 'error'; message: string; detail: string };
 
 export function WelcomeScreen({ onGuest }: Props) {
-  const { configured, signInWithApple } = useAuth();
+  const { configured } = useAuth();
   const [intent, setIntent] = useState<AuthIntent>(null);
   const [providerState, setProviderState] = useState<ProviderState>({ state: 'loading' });
-  const [appleBusy, setAppleBusy] = useState(false);
-  const [appleError, setAppleError] = useState<string | null>(null);
 
   useEffect(() => {
     const url = import.meta.env.VITE_SUPABASE_URL;
@@ -62,7 +59,6 @@ export function WelcomeScreen({ onGuest }: Props) {
           state: 'ready',
           providers: {
             google: Boolean(data.external?.google),
-            apple: Boolean(data.external?.apple),
             email: data.external?.email !== false,
           },
         });
@@ -90,23 +86,6 @@ export function WelcomeScreen({ onGuest }: Props) {
   }, []);
 
   const isUp = intent === 'sign-up';
-
-  const onApple = async () => {
-    setAppleError(null);
-    setAppleBusy(true);
-    try {
-      await signInWithApple();
-    } catch (err) {
-      console.error(err);
-      const msg = err instanceof Error ? err.message : String(err);
-      if (/provider is not enabled|Unsupported provider/i.test(msg)) {
-        setAppleError('Apple sign-in isn’t enabled in Supabase yet.');
-      } else {
-        setAppleError(msg || 'Couldn’t start Apple sign-in.');
-      }
-      setAppleBusy(false);
-    }
-  };
 
   return (
     <>
@@ -189,28 +168,6 @@ export function WelcomeScreen({ onGuest }: Props) {
                   </p>
                 </div>
               )}
-
-              {providerState.providers.apple ? (
-                <button
-                  type="button"
-                  className="auth-apple-btn"
-                  onClick={() => void onApple()}
-                  disabled={appleBusy}
-                >
-                  {appleBusy ? 'Redirecting…' : 'Continue with Apple'}
-                </button>
-              ) : (
-                <div className="auth-provider-disabled">
-                  <button type="button" className="auth-apple-btn" disabled>
-                    Continue with Apple
-                  </button>
-                  <p className="auth-hint">
-                    Apple isn’t turned on in Supabase yet (Authentication → Providers → Apple). It
-                    needs an Apple Developer Services ID and key.
-                  </p>
-                </div>
-              )}
-              {appleError && <p className="auth-error">{appleError}</p>}
 
               {providerState.providers.email && (
                 <>
