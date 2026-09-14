@@ -4,9 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#035A32" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!--
+      Deliberately no apple-mobile-web-app-capable. On iOS it launches the home
+      screen icon in a standalone context with its own storage, separate from
+      Safari's — and the Google OAuth redirect completes in an in-app browser
+      that the standalone app never sees, so sign-in silently never sticks and
+      the welcome screen returns on every launch. Re-adding it brings that back.
+      Android is unaffected: installed web apps there share Chrome's storage.
+    -->
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>matcha pocket</title>
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
