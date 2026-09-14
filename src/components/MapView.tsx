@@ -160,10 +160,19 @@ export function MapView({
           '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a>',
         );
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      // CARTO's basemaps now stamp "API KEY REQUIRED" across unkeyed tiles, so the
+      // default is OpenStreetMap's keyless service. Set VITE_MAP_TILE_URL to go
+      // back to CARTO's lighter style (or any provider) once you have a key, e.g.
+      // https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_key=…
+      const tileUrl =
+        (import.meta.env.VITE_MAP_TILE_URL as string | undefined) ||
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+      L.tileLayer(tileUrl, {
         attribution: '',
+        // Only CARTO-style URLs use {s}; harmless for providers that don't.
         subdomains: 'abcd',
-        maxZoom: 20,
+        maxZoom: 19,
         updateWhenZooming: false,
         updateWhenIdle: true,
         keepBuffer: 2,
