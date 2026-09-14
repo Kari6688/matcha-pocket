@@ -20,10 +20,34 @@
   --welcome-logo: #111111;
   --font:         'PP Neue Montreal Mono', ui-monospace, monospace;
   --font-mono:    var(--font);
-  --font-display: 'PP Kyoto', Georgia, 'Times New Roman', serif;
+  /* Headers use a plain grotesque. The PP Kyoto @font-face blocks below are left
+     in place but unreferenced — browsers only fetch a face that something uses,
+     so they cost nothing and make going back to the serif a one-line change. */
+  --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+                  Arial, sans-serif;
   --font-serif:   var(--font-display);
   --nav-h:        64px;
   --nav-bottom:   calc(18px + env(safe-area-inset-bottom, 0px));
+}
+
+/* A grotesque needs tracking pulled in as it gets larger, or display text reads
+   loose and unset. The serif this replaced didn't. Small labels keep default. */
+.brand-name,
+.auth-wall-title,
+.welcome-title,
+.setup-missing h1,
+.sheet-title,
+.collection-title,
+.tin-detail-name,
+.photo-crop-title,
+.loc-prompt-title,
+.loc-panel-title {
+  letter-spacing: -0.021em;
+}
+
+.welcome-title,
+.setup-missing h1 {
+  letter-spacing: -0.032em;
 }
 
 /* PP Kyoto — headers */
